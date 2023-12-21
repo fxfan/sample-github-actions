@@ -55,4 +55,4 @@ jobs:
         uses: peter-evans/enable-pull-request-automerge@v1
         with:
           pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-      # == import: create-pull-request / end ==
+          token: ${{ secrets.GITHUB_TOKEN }}
