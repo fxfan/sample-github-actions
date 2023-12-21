@@ -1,9 +1,19 @@
-images:
-  prod:
-    stable:
-      image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
-      last-updated-at: 2023-12-21_150000
-  staging:
-    stable:
-      image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
-      last-updated-at: 2023-12-21_150000
+projectName: xxx-staging
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 250Mi
+  limits:
+    cpu: 200m
+    memory: 500Mi
+
+hoge:
+  - インデントが狂うかもしれない配列
+  - インデントが狂うかもしれない配列
+  - インデントが狂うかもしれない配列
+
+# 消えるかもしれないコメント
+versions:
+  stable:
+    image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef

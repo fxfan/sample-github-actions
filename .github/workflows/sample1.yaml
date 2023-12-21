@@ -7,16 +7,52 @@ on:
       - src/**
 
 jobs:
-  sample1:
+  create-pull-request:
+    name: Create Delivery PR
     runs-on: ubuntu-latest
     steps:
       - name: Check out
         uses: actions/checkout@v2
-      - name: Xxx
+      # - name: Set up Cloud SDK
+      #   uses: google-github-actions/setup-gcloud@v0
+      #   with:
+      #     project_id: upsidr-images
+      #     service_account_key: ${{ secrets.GCLOUD_UPSIDR_IMAGES_SA_RAW }}
+      - name: Update to Latest Image
         run: |
-          current_image=$(yq eval ".images.staging.stable.image" values-staging.yaml)
-          echo "current image: $current_image"
-          current_image_base=$(echo "$current_image" | sed -e "s/\(.*\)@.*/\1/")
-          echo "current image base: $current_image_base"
-          latest_image=$(./tools/latest-image.sh "$current_image_base")
-          echo "latest image: $latest_image"
+          ./tools/update-to-latest-image.sh values-staging.yaml ".versions.stable.image"
+      - name: Create PR
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: automation/update-images
+          delete-branch: true
+          title: "[Automated] Update Images"
+          committer: CohoTech Concierge <concierge@cohotech.co>
+          author: CohoTech Concierge <concierge@cohotech.co>
+          labels: automation
+          body: |
+            # OVERVIEW
+
+            **WHAT**:
+            - Automation to update images
+
+            **WHY**:
+            - Get latest artifacts
+
+            ## DETAILS OF REQUEST
+
+            ### Reference
+            - This PR has been created by automation
+            - PR pushed by: ${{ github.event.pusher.name }}
+            - Code diff: ${{ github.event.compare }}
+
+            ### Expected Impact
+            - New images will be deployed
+
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v1
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+      # == import: create-pull-request / end ==
