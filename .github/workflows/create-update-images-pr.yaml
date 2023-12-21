@@ -1,4 +1,4 @@
-name: Sample1
+name: Create Update Images PR
 on:
   push:
     branches:
@@ -50,9 +50,13 @@ jobs:
             ### Expected Impact
             - New images will be deployed
 
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v1
-        with:
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-      # == import: create-pull-request / end ==
+      # - name: Enable Pull Request Automerge
+      #   if: steps.cpr.outputs.pull-request-operation == 'created'
+      #   uses: peter-evans/enable-pull-request-automerge@v1
+      #   with:
+      #     pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+

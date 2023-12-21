@@ -1,4 +1,6 @@
 projectName: xxx-staging
+#
+# 
 resources:
   requests:
     cpu: 100m
@@ -6,6 +8,8 @@ resources:
   limits:
     cpu: 200m
     memory: 500Mi
+#
+# 
 hoge:
   - インデントが狂うかもしれない配列
   - インデントが狂うかもしれない配列

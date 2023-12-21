@@ -15,6 +15,7 @@ fi
 
 file_name=$1
 property_path=$2
+script_dir=$(dirname "$0")
 
 current_image=$(yq eval "${property_path}" "$file_name")
 echo "Current image: $current_image"
@@ -22,7 +23,7 @@ image_name=$(echo $current_image | cut -d '@' -f 1)
 
 # Digests contain the prefix 'sha256:'
 current_digest=$(echo $current_image | cut -d '@' -f 2)
-latest_digest=$("./tools/latest-image-digest.sh" "$image_name")
+latest_digest=$("$script_dir/latest-image-digest.sh" "$image_name")
 echo "Latest digest: $latest_digest"
 
 if [ -z "$latest_digest" ]; then
