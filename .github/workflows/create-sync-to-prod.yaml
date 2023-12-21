@@ -1,0 +1,53 @@
+name: Automated Sync to PROD
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Ref:
+  # https://github.com/peter-evans/create-pull-request/blob/master/docs/examples.md#keep-a-branch-up-to-date-with-another
+  sync-to-prod-prep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: prod
+      - name: Reset to sync branch
+        run: |
+          git fetch origin main:main
+          git reset --hard main
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: main
+          title: "[Automated] Sync to PROD"
+          committer: Cohotech Concierge <concierge@cohotech.co>
+          author: Cohotech Concierge <concierge@cohotech.co>
+          labels: automation, prod
+          body: |
+            # OVERVIEW
+
+            **WHAT**:
+            - PROD release after confirming behaviour in Staging
+
+            **WHY**:
+            - To release the latest Staging setup into PROD
+
+            ## DETAILS OF REQUEST
+
+            ### Reference
+            - Change owner will need to provide this via comment
+
+            ### Expected Impact
+            - Change owner will need to provide this via comment
+
+            ## TESTING & ROLLBACK EVIDENCE
+
+            ### Staging Chronos
+            - Reviewer to provide screenshot from https://argocd.staging.upsider.dev/applications
+
+            ### Potential Rollback
+            The change will automatically take place by merging the Pull Request. Thus, the rollback procedure will be another Pull Request to get back to the previous commit, by reverting this Pull Request.
+
+            The rollback will be done similarly to the following examples in the past:
