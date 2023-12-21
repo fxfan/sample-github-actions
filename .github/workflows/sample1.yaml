@@ -1,0 +1,20 @@
+name: Sample1
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src
+
+jobs:
+  sample1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+      - name: Xxx
+        run: |
+          current_image=$(yq eval ".images.staging.stable.image" values-staging.yaml)
+          echo "current image: $current_image"
+          current_image_base=$(echo "$current_image" | sed -e "s/\(.*\)@.*/\1/")
+          echo "current image base: $current_image_base"

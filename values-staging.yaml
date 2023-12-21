@@ -1,0 +1,9 @@
+images:
+  prod:
+    stable:
+      image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+      last-updated-at: 2023-12-21_150000
+  staging:
+    stable:
+      image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+      last-updated-at: 2023-12-21_150000
