@@ -18,3 +18,5 @@ jobs:
           echo "current image: $current_image"
           current_image_base=$(echo "$current_image" | sed -e "s/\(.*\)@.*/\1/")
           echo "current image base: $current_image_base"
+          latest_image=$(./tools/latest-image.sh "$current_image_base")
+          echo "latest image: $latest_image"
