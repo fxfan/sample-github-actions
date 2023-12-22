@@ -17,4 +17,4 @@ hoge:
 # 消えるかもしれないコメント
 versions:
   stable:
-    image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+    image: gcr.io/my-images/hoge@sha256:eec684cbad766fc40ca2c1bb05ed91e7cf3d594bab1387cf87ccd0a957f6a9cd
