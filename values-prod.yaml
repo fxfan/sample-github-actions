@@ -1,0 +1,20 @@
+projectName: xxx-prod
+#
+# 
+resources:
+  requests:
+    cpu: 100m
+    memory: 250Mi
+  limits:
+    cpu: 200m
+    memory: 500Mi
+#
+# 
+hoge:
+  - インデントが狂うかもしれない配列
+  - インデントが狂うかもしれない配列
+  - インデントが狂うかもしれない配列
+# 消えるかもしれないコメント
+versions:
+  stable:
+    image: gcr.io/my-images/hoge@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
