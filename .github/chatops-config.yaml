@@ -1,0 +1,15 @@
+---
+version: 0.2.0
+
+trigger: specific
+
+users:
+  active:
+    - fxfan
+    - kosuda-h
+
+keywords:
+  - name: update-staging-stable
+    value: '^\/update-staging-stable\s*$'
+  - name: promote-staging-stable-to-prod
+    value: '^\/promote-staging-stable-to-prod\s*$'

@@ -1,0 +1,99 @@
+name: ChatOps for Release
+on:
+  issue_comment:
+    # This shouldn't be called for comment deletion
+    types:
+      - created
+      - edited
+
+jobs:
+  chatops:
+    name: ChatOps
+    runs-on: ubuntu-latest
+
+    outputs:
+      comvent-found-any-match: ${{ steps.comvent.outputs.comvent-found-any-match }}
+      update-staging-stable: ${{ steps.comvent.outputs.update-staging-stable }}
+      promote-staging-stable-to-prod: ${{ steps.comvent.outputs.promote-staging-stable-to-prod }}
+
+    steps:
+      - name: Handle with Comvent
+        uses: rytswd/comvent@v0.4
+        if: ${{ !github.event.issue.pull_request }} # Run only if it's issue comment, not PR
+        id: comvent
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: .github/chatops-config.yaml
+      - name: Debug Output
+        run: |
+          echo "update-staging-stable: '${{ steps.comvent.outputs.update-staging-stable }}'"
+          echo "promote-staging-stable-to-prod: '${{ steps.comvent.outputs.promote-staging-stable-to-prod }}'"
+
+  release:
+    name: Release Management
+    runs-on: ubuntu-latest
+    needs: chatops
+    if: always() && needs.chatops.outputs.comvent-found-any-match != ''
+    env:
+        suffix: '[ Unknown ]'
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+      # Cloud SDK is only needed by update-staging-stable,
+      # which needs to get the latest image digest.
+      - name: Set up Cloud SDK
+        if: needs.chatops.outputs.update-staging-stable != ''
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: cohotech-images
+          service_account_key: ${{ secrets.GCLOUD_COHOTECH_IMAGES_SA }}
+      # Main ChatOps setup
+      - if: needs.chatops.outputs.update-staging-stable != ''
+        name: Update Staging Stable
+        run: |
+          ./tools/update-to-latest-image.sh values-staging.yaml ".versions.stable.image"
+      - if: needs.chatops.outputs.promote-staging-stable-to-prod != ''
+        name: Promote Staging Stable to PROD
+        run: |
+          ./tools/promote-images-to-prod.sh values-staging.yaml values-prod.yaml ".versions.stable.image"
+      - name: Check Update Details
+        run: |
+          envs=()
+          git status -s | grep 'values-prod' && envs+=("PROD") || echo ''
+          git status -s | grep 'values-staging' && envs+=("Staging") || echo ''
+
+          if (( ${#envs[@]} )); then
+            envsCsv=$(printf ", %s" "${envs[@]}")
+            echo "suffix=[${envsCsv:1} ]" >> $GITHUB_ENV
+          fi
+      - id: cpr
+        name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: automation/update
+          delete-branch: true
+          title: "[ Automated ] Update Images ${{ env.suffix }}"
+          committer: COHOTECH Concierge <concierge@cohotech.co>
+          author: COHOTECH Concierge <concierge@cohotech.co>
+          labels: automation
+          body: |
+            # OVERVIEW
+
+            **WHAT**:
+            - Automation to update images
+
+            **WHY**:
+            - Version update requested
+
+            ## DETAILS OF REQUEST
+
+            ### Reference
+            - This PR has been created by automation
+            - Issue: #${{ github.event.issue.number }}
+            - Commented by: `${{ github.event.sender.login }}`
+            - Comment: 
+
+            > ${{ github.event.comment.body }}
+
+            ### Expected Impact
+            - New images will be deployed
